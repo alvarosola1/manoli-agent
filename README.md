@@ -1,8 +1,6 @@
 ```markdown
 ```
-# Manoli Agent (Docker Only - Gemini Compatible)
-
-Manoli Agent es un proyecto basado en Python diseñado para [describe aquí el propósito del agente, por ejemplo:  "automatizar tareas de...", "interactuar con APIs de...", "procesar datos de...",  o si es un agente de IA: "ser un agente conversacional...", "realizar inferencias...", "aprender de datos...".  **Necesitas especificar el propósito del agente aquí**].
+# Manoli Agent 
 
 Este repositorio contiene el código fuente, la configuración y los recursos necesarios para ejecutar el Manoli Agent **usando Docker**.  **Actualmente, Manoli Agent solo es compatible con el modelo Gemini de Google.**
 
