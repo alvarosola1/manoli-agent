@@ -6,23 +6,14 @@ Este repositorio contiene el código fuente, la configuración y los recursos ne
 
 ## Tabla de Contenidos
 
-- [Características](#características)
 - [Instalación con Docker](#instalación-con-docker)
     - [Prerrequisitos](#prerrequisitos)
     - [Configuración del API Key de Gemini](#configuración-del-api-key-de-gemini)
     - [Pasos](#pasos)
-- [Uso](#uso)
-    - [Ejemplo](#ejemplo)
 - [Licencia](#licencia)
 - [Contribución](#contribución)
 - [Contacto](#contacto)
 
-## Características
-
-- **Agente configurable:**  [Describe la flexibilidad de configuración del agente si la tiene.]
-- **Compatible con Gemini:**  [Indica que el agente está diseñado para funcionar con el modelo Gemini de Google.]
-- **[Característica clave 3]:**  [Describe otra característica clave.]
-- **[Etc...]:**  [Añade más características según sea necesario.]
 
 *Necesitas completar esta sección con las características específicas de tu Manoli Agent.*
 
@@ -68,22 +59,6 @@ Manoli Agent requiere una API Key de Google Gemini para funcionar. Sigue estos p
 
     Este comando construirá la imagen de Docker (si es la primera vez o si hay cambios en el `Dockerfile` o `docker-compose.yml`) y luego iniciará el contenedor del Manoli Agent en segundo plano.
 
-## Uso
-
-Para utilizar el Manoli Agent, puedes seguir el ejemplo proporcionado en el notebook de Jupyter: [`src/notebooks/agent_notebook.ipynb`](src/notebooks/agent_notebook.ipynb).
-
-Este notebook contiene una demostración paso a paso de cómo:
-
-- **Cargar y configurar el agente.**
-- **Ejecutar el agente con diferentes prompts.**
-- **Analizar la salida del agente.**
-- **Experimentar con diferentes parámetros.**
-
-Asegúrate de revisar el notebook para entender completamente cómo interactuar con el Manoli Agent y cómo puedes integrarlo en tus propios proyectos o flujos de trabajo.
-
-[//]: # ` bash)
-[//]: # python src/agent.py --config config.yaml --task "realizar tarea X")
-[//]: #  `
 
 ## Licencia
 
@@ -113,9 +88,3 @@ Por favor, asegúrate de seguir las guías de estilo de código del proyecto y a
 [//]: # - ...)
 
 -----
-
-*Este README.md es una plantilla.  Por favor, rellena los campos [necesitas especificar...] y  [describe aquí...] con la información específica de tu proyecto Manoli Agent. Cuanto más detallado y preciso sea el README, más fácil será para otros entender y utilizar tu proyecto.*  **Recuerda que este agente, en su versión actual, solo es compatible con Gemini.**
-```
-
-```
-He incluido el contenido en formato markdown dentro de un bloque de código (` `) para que puedas copiar y pegar directamente en tu archivo `README.md` sin problemas de formato.  Recuerda **revisar y completar todas las secciones marcadas con `[necesitas especificar...]` y `[describe aquí...]`** para personalizarlo con la información específica de tu proyecto Manoli Agent. ¡Mucha suerte con tu repositorio!
