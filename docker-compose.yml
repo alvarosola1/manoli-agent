@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  web:
+    build: .  # Construye la imagen desde el Dockerfile en el directorio actual
+    ports:
+      - "8000:8000" # Mapea el puerto 8000 del contenedor al puerto 8000 del host
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY} # Pasa la variable de entorno GEMINI_API_KEY al contenedor
+    volumes:
+      - .:/app  # Monta el directorio local (proyecto) en /app dentro del contenedor (para desarrollo, opcional en producción)
