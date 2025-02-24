@@ -12,7 +12,6 @@ Este repositorio contiene el código fuente, la configuración y los recursos ne
     - [Pasos](#pasos)
 - [Licencia](#licencia)
 - [Contribución](#contribución)
-- [Contacto](#contacto)
 
 
 *Necesitas completar esta sección con las características específicas de tu Manoli Agent.*
@@ -64,8 +63,6 @@ Manoli Agent requiere una API Key de Google Gemini para funcionar. Sigue estos p
 
 Este proyecto está licenciado bajo los términos de la licencia especificada en el archivo [LICENSE](LICENSE). Consulta el archivo para obtener más detalles sobre los derechos y restricciones de uso.
 
-[//]: # (Ejemplo: "Este proyecto está licenciado bajo la Licencia MIT - consulta el archivo [LICENSE](LICENSE) para detalles")
-
 ## Contribución
 
 ¡Las contribuciones son bienvenidas! Si deseas contribuir a este proyecto, por favor sigue estos pasos:
@@ -78,13 +75,5 @@ Este proyecto está licenciado bajo los términos de la licencia especificada en
 
 Por favor, asegúrate de seguir las guías de estilo de código del proyecto y añadir tests unitarios para nuevas funcionalidades.
 
-## Contacto
-
-[Tu Nombre/Usuario - alvarosola1] - [Tu Email o Enlace a tu perfil de GitHub/LinkedIn, etc.]
-
-[//]: # - Enlaces a documentación adicional si la hay)
-[//]: # - Agradecimientos)
-[//]: # - Información sobre cómo reportar bugs o solicitar nuevas características)
-[//]: # - ...)
 
 -----
