@@ -10,21 +10,18 @@ from browser_use import Agent, BrowserConfig
 from browser_use.browser.browser import Browser
 from browser_use.browser.context import BrowserContextConfig
 
-# Carga variables de entorno (por si necesitas la clave de la API)
+# Carga variables de entorno
 load_dotenv()
 
-# Recupera la clave de la API de tu modelo
 api_key = os.getenv('GEMINI_API_KEY')
 if not api_key:
     raise ValueError('GEMINI_API_KEY is not set')
 
-# Crea instancia de LLM (ajusta parámetros al modelo que uses)
 llm = ChatGoogleGenerativeAI(
     model='gemini-2.0-flash-exp',
     api_key=SecretStr(api_key)
 )
 
-# Configura el navegador
 browser = Browser(
     config=BrowserConfig(
         headless=True,
@@ -35,20 +32,16 @@ browser = Browser(
     )
 )
 
-# Configura el logger
+# Obtenemos el logger (sin añadir handlers extra)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-ch = logging.StreamHandler()
-ch.setFormatter(formatter)
-logger.addHandler(ch)
 
 async def run_search(prompt_usuario, log_callback):
     """
     Lanza el agente con la instrucción 'prompt_usuario'.
     Utiliza 'log_callback' para registrar mensajes en tiempo real (ej. en tu frontal).
     Retorna (texto_final, video_path) si finaliza correctamente, o mensaje de error.
-    'video_path' seguirá siendo None ya que la versión de 'browser_use' que usas no graba video.
+    'video_path' seguirá siendo None en esta versión.
     """
     def agent_log(message):
         # Callback para loguear y mandar mensajes al frontal
@@ -64,34 +57,19 @@ async def run_search(prompt_usuario, log_callback):
 
     try:
         result = await agent.run(max_steps=25)
+        video_path = None
 
-        # Si quisieras cerrar completamente el navegador al acabar:
-        # if hasattr(agent.browser, "close"):
-        #     await agent.browser.close()
-        #
-        # o
-        # if hasattr(agent.browser, "shutdown"):
-        #     await agent.browser.shutdown()
-
-        video_path = None  # No hay grabación de video en esta versión
-
-        texto_final = "No se encontró un resultado final en la historia del agente." # <--- Inicializar aquí
-
-        # Si es un AgentHistoryList, extraer texto final
+        texto_final = "No se encontró un resultado final en la historia del agente."
         if hasattr(result, "all_results"):
             pasos = result.all_results
-            # texto_final = None  <--- Eliminar de aquí
-
             for r in pasos:
                 if getattr(r, "is_done", False) and getattr(r, "success", False):
                     texto_final = getattr(r, "extracted_content", None)
-                    if texto_final: # Asegurarse de que no sea None, por si acaso
-                        break # Parar en el primer resultado exitoso
-
-            return (texto_final, video_path) # <--- Siempre retornar tuple
+                    if texto_final:
+                        break
+            return (texto_final, video_path)
         else:
-            # Si no tiene 'all_results', devuélvelo tal cual (mejor convertir a string para consistencia)
-            return (str(result), video_path) # <--- Convertir a string para consistencia
+            return (str(result), video_path)
 
     except Exception as e:
         logger.error(f"Error durante agent.run(): {e}")
@@ -105,7 +83,6 @@ if __name__ == '__main__':
         def dummy_log_callback(message):
             print(message)
 
-        # Prueba simple
         result_prueba = await run_search(
             "Ve a amazon.es y busca calcetines de unicornio",
             dummy_log_callback
