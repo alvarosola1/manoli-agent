@@ -1,237 +1,326 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Agente Browser Web - Chat</title>
-    <style>
-        html, body {
-            /* 1) Hacer que todo ocupe la ventana del navegador */
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-        body {
-            font-family: sans-serif;
-            background-color: #f5f5f5;
-            display: flex; 
-            flex-direction: column; 
-        }
+  <meta charset="UTF-8" />
+  <title>Agente Browser Web - Chat</title>
+  <style>
+    /* RESET BÁSICO */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* El contenedor principal que ocupe toda la pantalla */
-        .container {
-            flex: 1; /* Para que ocupe todo el espacio vertical disponible */
-            display: flex; 
-            flex-direction: column; 
-            max-width: 1200px; /* Ajusta si quieres más ancho */
-            width: 100%;
-            margin: 0 auto; /* Centra horizontalmente */
-            background-color: #fff; 
-            border: 1px solid #ccc; 
-            border-radius: 5px;
-        }
-        header {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        h1 {
-            margin: 0;
-        }
+    html, body {
+      height: 100%;
+      font-family: 'Open Sans', sans-serif;
+      background-color: #F2F2F2;
+      color: #333;
+    }
 
-        /* Formulario y chat contenedor */
-        #prompt-form {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-        }
-        #prompt-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        #submit-button {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-        }
-        #submit-button:hover:enabled {
-            background-color: #0056b3;
-        }
-        #submit-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
+    /* Estructura general */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Contenedor del chat */
-        #chat-container {
-            flex: 1; /* Ocupa todo el espacio vertical sobrante */
-            padding: 10px;
-            overflow-y: auto; 
-            display: flex;
-            flex-direction: column;
-            background-color: #fafafa;
-        }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .user-message, .agent-message {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            word-wrap: break-word;
-            max-width: 80%;
-        }
-        .user-message {
-            background-color: #DCF8C6; 
-            align-self: flex-end; 
-        }
-        .agent-message {
-            background-color: #ECECEC; 
-            align-self: flex-start; 
-        }
-        .video-container {
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .video-container video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .agent-response-area {
-            margin-top: 10px;
-        }
-        .agent-log-area {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-            background: #fefefe;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+    main {
+      flex: 1; /* Ocupa todo el espacio vertical sobrante */
+      display: flex;
+      flex-direction: column;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      margin-top: 20px; /* Separación debajo del header */
+      position: relative;
+    }
 
-        /* Spinner (circulito de carga) */
-        #loading-overlay {
-            position: fixed;
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            display: none; /* Por defecto oculto */
-            align-items: center;
-            justify-content: center;
-            z-index: 9999; 
-        }
-        .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #007BFF;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg);}
-            100% { transform: rotate(360deg);}
-        }
-    </style>
+    /* Chat */
+
+    #chat-container {
+      flex: 1; /* Para ocupar el espacio disponible en vertical */
+      background-color: #ffffff;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      margin: 0 20px; /* Margen horizontal */
+      padding: 20px;
+      overflow-y: auto; /* Scrollable */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      max-width: 70%;
+      line-height: 1.4;
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      border-radius: 5px;
+    }
+    .user-message {
+      align-self: flex-end;
+      background-color: #DCF8C6;
+    }
+    .agent-message {
+      align-self: flex-start;
+      background-color: #ECECEC;
+    }
+    .message strong {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    /* Video más pequeño */
+    .video-container {
+      width: 320px;
+      max-width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .video-container video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .agent-log-area {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+      background: #fefefe;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    /* Formulario al final, con margen extra en la parte de abajo */
+    #prompt-form {
+      display: flex;
+      gap: 10px;
+      margin: 20px 20px 30px 20px; /* Top, Right, Bottom, Left */
+    }
+    #prompt-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    #submit-button {
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    #submit-button:hover:enabled {
+      background-color: #0056b3;
+    }
+    #submit-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Overlay para mostrar spinner */
+    #loading-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #007BFF;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
+    }
+
+    /* Flecha de scroll */
+    #scroll-down-btn {
+      display: none;
+      position: fixed;
+      bottom: 90px; /* Ajusta para no chocar con el form */
+      right: 30px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.2s ease;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    #scroll-down-btn:hover {
+      background-color: #0056b3;
+    }
+
+    @media(max-width: 600px) {
+      #chat-container {
+        margin: 0 10px;
+        padding: 10px;
+      }
+      .message {
+        margin-bottom: 10px;
+      }
+      #prompt-form {
+        margin: 10px;
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Capa overlay para mostrar el spinner -->
-    <div id="loading-overlay">
-        <div class="spinner"></div>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <button id="scroll-down-btn">↓</button>
+
+  <header>
+    <span>Manoli - Agente Web</span>
+  </header>
+
+  <main>
+    <div id="chat-container">
+      {% if conversation_history %}
+        {% for item in conversation_history %}
+          {% if item.role == 'user' %}
+            <div class="message user-message">
+              <strong>Yo:</strong>
+              <div>{{ item.content }}</div>
+            </div>
+          {% elif item.role == 'agent' %}
+            <div class="message agent-message">
+              <strong>Agente:</strong>
+              {% if item.response_text %}
+                <p>{{ item.response_text }}</p>
+              {% endif %}
+              {% if item.video_url %}
+                <div class="video-container">
+                  <video controls>
+                    <source src="{{ item.video_url }}" type="video/webm">
+                    Tu navegador no soporta el tag de video.
+                  </video>
+                </div>
+              {% endif %}
+              {% if item.log_lines and item.log_lines|length > 0 %}
+                <div class="agent-log-area">
+                  {% for log_line in item.log_lines %}
+                    <div>{{ log_line }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </div>
 
-    <div class="container">
-        <header>
-            <h1>Agente Browser Web - Chat</h1>
-        </header>
+    <form id="prompt-form" action="/ejecutar_agente" method="post">
+      <input type="text" id="prompt-input" name="prompt_usuario" placeholder="Escribe aquí tu prompt..." required>
+      <button id="submit-button" type="submit">Enviar</button>
+    </form>
+  </main>
 
-        <div id="chat-container">
-            {% if conversation_history %}
-                {% for item in conversation_history %}
-                    {% if item.role == 'user' %}
-                        <div class="user-message">
-                            <strong>Usuario:</strong> {{ item.content }}
-                        </div>
-                    {% elif item.role == 'agent' %}
-                        <div class="agent-message">
-                            <strong>Agente:</strong>
-                            <div class="agent-response-area">
-                                {% if item.response_text %}
-                                    <p>{{ item.response_text }}</p>
-                                {% endif %}
-                                {% if item.video_url %}
-                                    <div class="video-container">
-                                        <video controls>
-                                            <source src="{{ item.video_url }}" type="video/webm">
-                                            Tu navegador no soporta el tag de video.
-                                        </video>
-                                    </div>
-                                {% endif %}
-                                {% if item.log_lines and item.log_lines|length > 0 %}
-                                    <div class="agent-log-area">
-                                        {% for log_line in item.log_lines %}
-                                            <div>{{ log_line }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        </div>
+  <script>
+    const promptForm = document.getElementById('prompt-form');
+    const submitButton = document.getElementById('submit-button');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const chatContainer = document.getElementById('chat-container');
+    const scrollBtn = document.getElementById('scroll-down-btn');
 
-        <form id="prompt-form" action="/ejecutar_agente" method="post">
-            <input type="text" id="prompt-input" name="prompt_usuario" placeholder="Escribe aquí tu prompt..." required>
-            <button id="submit-button" type="submit">Enviar</button>
-        </form>
-    </div>
+    // Función para hacer scroll automático al final
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-    <script>
-        // Referencias a elementos
-        const promptForm = document.getElementById('prompt-form');
-        const submitButton = document.getElementById('submit-button');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const chatContainer = document.getElementById('chat-container');
+    // Verifica si estamos scrolleados hasta el final (con pequeño margen)
+    function isAtBottom() {
+      const threshold = 20; // Aumentamos el threshold a 20
+      return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < threshold;
+    }
 
-        // 1) Hacer scroll automático al final
-        function scrollToBottom() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-        // Llamar al cargar la página
+    // Muestra/oculta flecha
+    function toggleScrollBtn() {
+      if (!isAtBottom()) {
+        scrollBtn.style.display = 'flex';
+      } else {
+        scrollBtn.style.display = 'none';
+      }
+    }
+
+    // Click en flecha => scroll al final
+    scrollBtn.addEventListener('click', () => {
+      scrollToBottom();
+    });
+
+    // Evento scroll en contenedor
+    chatContainer.addEventListener('scroll', () => {
+      toggleScrollBtn();
+    });
+
+    // Al cargar la página
+    window.onload = function() {
+      // Espera un poco más para asegurar que el contenido se ha renderizado completamente
+      setTimeout(() => {
         scrollToBottom();
+        toggleScrollBtn();
+      }, 500); // Aumentamos el tiempo de espera a 500ms
+    };
 
-        // 2) Al enviar el form, mostrar spinner y desactivar botón
-        promptForm.addEventListener('submit', function() {
-            // Mostrar overlay
-            loadingOverlay.style.display = 'flex';
-            // Desactivar botón
-            submitButton.disabled = true;
-        });
+    // Al enviar formulario
+    promptForm.addEventListener('submit', function() {
+      loadingOverlay.style.display = 'flex';
+      submitButton.disabled = true;
 
-        // 3) Para reactivar el botón y ocultar overlay cuando la respuesta se reciba,
-        //    puedes usar un "turbo" o "fetch" en AJAX. Pero con un <form> normal,
-        //    se recarga la página. Necesitaríamos un approach en AJAX o WebSocket
-        //    si quieres reactivarlo sin recargar. 
-        //
-        //    *Si la página se recarga*, el overlay desaparece automáticamente,
-        //    pues es un nuevo HTML. El scroll se llamará de nuevo en la
-        //    onload, etc.
+      // Espera un breve momento y luego fuerza el scroll al final después de enviar el formulario
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100); // Un pequeño delay para que el mensaje del usuario se añada al DOM
+    });
 
-        // 4) Forzar scroll al final tras un repaint
-        //    con setTimeout para asegurar que el DOM ya haya renderizado
-        window.onload = function() {
-            setTimeout(() => {
-                scrollToBottom();
-            }, 100);
-        };
-    </script>
-</body>
+    // Observador para asegurar el scroll cuando se añaden nuevos mensajes al chat-container
+    const observer = new MutationObserver(function(mutationsList, observer) {
+      for(let mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          // Añadimos un pequeño delay antes de hacer scroll
+          setTimeout(() => {
+            scrollToBottom(); // Scroll al final cada vez que se añade un nuevo nodo hijo (mensaje)
+            toggleScrollBtn(); // Recalculamos si mostrar o no la flecha
+          }, 50); // Un retraso de 50 milisegundos (puedes ajustarlo si es necesario)
+        }
+      }
+    });
+
+    observer.observe(chatContainer, { childList: true, subtree: true }); // Observa cambios en hijos directos y descendientes
+  </script>
+  </body>
 </html>
