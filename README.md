@@ -14,8 +14,6 @@ Este repositorio contiene el código fuente, la configuración y los recursos ne
 - [Contribución](#contribución)
 
 
-*Necesitas completar esta sección con las características específicas de tu Manoli Agent.*
-
 ## Instalación con Docker
 
 Para configurar y ejecutar Manoli Agent usando Docker, sigue estos pasos.
