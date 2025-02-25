@@ -4,26 +4,22 @@
   <meta charset="UTF-8" />
   <title>Agente Browser Web - Chat</title>
   <style>
-    /* RESET BÁSICO */
+    /* Tus estilos, sin cambios */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     html, body {
       height: 100%;
       font-family: 'Open Sans', sans-serif;
       background-color: #F2F2F2;
       color: #333;
     }
-
-    /* Estructura general */
     body {
       display: flex;
       flex-direction: column;
     }
-
     header {
       background-color: #007BFF;
       color: white;
@@ -32,32 +28,27 @@
       font-weight: 600;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
     main {
-      flex: 1; /* Ocupa todo el espacio vertical sobrante */
+      flex: 1;
       display: flex;
       flex-direction: column;
       max-width: 1000px;
       width: 100%;
       margin: 0 auto;
-      margin-top: 20px; /* Separación debajo del header */
+      margin-top: 20px;
       position: relative;
     }
-
-    /* Chat */
-
     #chat-container {
-      flex: 1; /* Para ocupar el espacio disponible en vertical */
+      flex: 1;
       background-color: #ffffff;
       border-radius: 5px;
       border: 1px solid #ddd;
-      margin: 0 20px; /* Margen horizontal */
+      margin: 0 20px;
       padding: 20px;
-      overflow-y: auto; /* Scrollable */
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
-
     .message {
       max-width: 70%;
       line-height: 1.4;
@@ -78,8 +69,6 @@
       margin-bottom: 4px;
       font-weight: 600;
     }
-
-    /* Video más pequeño */
     .video-container {
       width: 320px;
       max-width: 100%;
@@ -93,22 +82,48 @@
       height: auto;
       display: block;
     }
-
-    .agent-log-area {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: #666;
-      background: #fefefe;
-      padding: 6px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+    #agent-execution-log {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.98);
+      border: 2px solid #007BFF;
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80%;
+      overflow-y: auto;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      z-index: 1001;
     }
-
-    /* Formulario al final, con margen extra en la parte de abajo */
+    #agent-log-messages {
+      font-family: monospace;
+      font-size: 1em;
+      white-space: pre-line;
+      color: #333;
+      line-height: 1.6;
+    }
+    #agent-execution-log h4 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #007BFF;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+    }
+    .agent-log-line {
+      margin-bottom: 2px;
+      font-family: monospace;
+      font-size: 0.9em;
+      color: #004080;
+    }
     #prompt-form {
       display: flex;
       gap: 10px;
-      margin: 20px 20px 30px 20px; /* Top, Right, Bottom, Left */
+      margin: 20px 20px 30px 20px;
     }
     #prompt-input {
       flex: 1;
@@ -134,8 +149,6 @@
       background-color: #ccc;
       cursor: not-allowed;
     }
-
-    /* Overlay para mostrar spinner */
     #loading-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -152,17 +165,16 @@
       width: 60px;
       height: 60px;
       animation: spin 1s linear infinite;
+      display: none;
     }
     @keyframes spin {
       0% {transform: rotate(0deg);}
       100% {transform: rotate(360deg);}
     }
-
-    /* Flecha de scroll */
     #scroll-down-btn {
       display: none;
       position: fixed;
-      bottom: 90px; /* Ajusta para no chocar con el form */
+      bottom: 90px;
       right: 30px;
       background-color: #007BFF;
       color: #fff;
@@ -181,7 +193,6 @@
     #scroll-down-btn:hover {
       background-color: #0056b3;
     }
-
     @media(max-width: 600px) {
       #chat-container {
         margin: 0 10px;
@@ -209,6 +220,13 @@
   </header>
 
   <main>
+    <div id="agent-execution-log">
+      <h4>Log de ejecución del agente:</h4>
+      <div id="agent-log-messages">
+        Iniciando ejecución del agente...
+      </div>
+    </div>
+
     <div id="chat-container">
       {% if conversation_history %}
         {% for item in conversation_history %}
@@ -232,11 +250,9 @@
                 </div>
               {% endif %}
               {% if item.log_lines and item.log_lines|length > 0 %}
-                <div class="agent-log-area">
                   {% for log_line in item.log_lines %}
-                    <div>{{ log_line }}</div>
+                    <div class="agent-log-line" data-role="agent">{{ log_line }}</div>
                   {% endfor %}
-                </div>
               {% endif %}
             </div>
           {% endif %}
@@ -257,18 +273,18 @@
     const chatContainer = document.getElementById('chat-container');
     const scrollBtn = document.getElementById('scroll-down-btn');
 
-    // Función para hacer scroll automático al final
+    const agentExecutionLog = document.getElementById('agent-execution-log');
+    const agentLogMessages = document.getElementById('agent-log-messages');
+
     function scrollToBottom() {
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Verifica si estamos scrolleados hasta el final (con pequeño margen)
     function isAtBottom() {
-      const threshold = 20; // Aumentamos el threshold a 20
+      const threshold = 20;
       return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < threshold;
     }
 
-    // Muestra/oculta flecha
     function toggleScrollBtn() {
       if (!isAtBottom()) {
         scrollBtn.style.display = 'flex';
@@ -277,50 +293,79 @@
       }
     }
 
-    // Click en flecha => scroll al final
     scrollBtn.addEventListener('click', () => {
       scrollToBottom();
     });
 
-    // Evento scroll en contenedor
     chatContainer.addEventListener('scroll', () => {
       toggleScrollBtn();
     });
 
-    // Al cargar la página
     window.onload = function() {
-      // Espera un poco más para asegurar que el contenido se ha renderizado completamente
       setTimeout(() => {
         scrollToBottom();
         toggleScrollBtn();
-      }, 500); // Aumentamos el tiempo de espera a 500ms
+      }, 500);
     };
 
-    // Al enviar formulario
+    function addAgentLogMessage(message) {
+      agentLogMessages.innerHTML += message + '\n';
+      agentExecutionLog.scrollTop = agentExecutionLog.scrollHeight;
+    }
+
+    // Conexión WebSocket para recibir logs en tiempo real
+    const logSocket = new WebSocket('ws://' + window.location.host + '/ws/logs');
+
+    logSocket.onopen = function() {
+      console.log("Conectado al servidor de logs.");
+    };
+
+    logSocket.onmessage = function(event) {
+      const logMessage = event.data;
+      addAgentLogMessage(logMessage);
+    };
+
+    logSocket.onerror = function(error) {
+      console.error("Error en la conexión WebSocket:", error);
+    };
+
+    logSocket.onclose = function() {
+      console.log("La conexión WebSocket se ha cerrado.");
+    };
+
     promptForm.addEventListener('submit', function() {
       loadingOverlay.style.display = 'flex';
       submitButton.disabled = true;
 
-      // Espera un breve momento y luego fuerza el scroll al final después de enviar el formulario
+      agentExecutionLog.style.display = 'block';
+      agentLogMessages.innerHTML = '';
+      agentLogMessages.innerHTML += 'Iniciando ejecución del agente...\n';
+
       setTimeout(() => {
         scrollToBottom();
-      }, 100); // Un pequeño delay para que el mensaje del usuario se añada al DOM
+      }, 100);
     });
 
-    // Observador para asegurar el scroll cuando se añaden nuevos mensajes al chat-container
     const observer = new MutationObserver(function(mutationsList, observer) {
-      for(let mutation of mutationsList) {
+      for (let mutation of mutationsList) {
         if (mutation.type === 'childList') {
-          // Añadimos un pequeño delay antes de hacer scroll
+          mutation.addedNodes.forEach(node => {
+            if (node.classList && node.classList.contains('agent-message')) {
+              const logLines = node.querySelectorAll('.agent-log-line');
+              logLines.forEach(logLine => {
+                addAgentLogMessage(logLine.textContent);
+              });
+            }
+          });
           setTimeout(() => {
-            scrollToBottom(); // Scroll al final cada vez que se añade un nuevo nodo hijo (mensaje)
-            toggleScrollBtn(); // Recalculamos si mostrar o no la flecha
-          }, 50); // Un retraso de 50 milisegundos (puedes ajustarlo si es necesario)
+            scrollToBottom();
+            toggleScrollBtn();
+          }, 50);
         }
       }
     });
 
-    observer.observe(chatContainer, { childList: true, subtree: true }); // Observa cambios en hijos directos y descendientes
+    observer.observe(chatContainer, { childList: true, subtree: true });
   </script>
-  </body>
+</body>
 </html>

@@ -6,3 +6,4 @@ pydantic
 browser-use
 jinja2
 python-multipart
+uvicorn[standard]
